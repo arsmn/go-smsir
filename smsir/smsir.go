@@ -99,7 +99,7 @@ func (c *Client) Delete(url string, body interface{}) (*http.Request, error) {
 	return c.NewRequest(http.MethodDelete, url, body)
 }
 
-func (c *Client) Do(ctx context.Context, req *http.Request, v APIResponse) error {
+func (c *Client) Do(ctx context.Context, req *http.Request, v apiResponse) error {
 	if ctx == nil {
 		return errors.New("context must be non-nil")
 	}
@@ -128,11 +128,11 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v APIResponse) error
 		}
 	}
 
-	if !v.IsSuccessful() {
+	if !v.isSuccessful() {
 		return &ErrorResponse{
-			Response:      resp,
-			Message:       v.Message(),
-			MessageDetail: v.MessageDetail(),
+			resp:          resp,
+			Message:       v.message(),
+			MessageDetail: v.messageDetail(),
 		}
 	}
 

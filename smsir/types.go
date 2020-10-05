@@ -6,39 +6,39 @@ import (
 )
 
 type (
-	APIResponse interface {
-		IsSuccessful() bool
-		Message() string
-		MessageDetail() string
+	apiResponse interface {
+		isSuccessful() bool
+		message() string
+		messageDetail() string
 	}
 
 	BaseResponse struct {
-		IsResSuccessful  bool   `json:"IsSuccessful,omitempty"`
-		ResMessage       string `json:"Message,omitempty"`
-		ResMessageDetail string `json:"MessageDetail,omitempty"`
+		IsSuccessful  bool   `json:"IsSuccessful,omitempty"`
+		Message       string `json:"Message,omitempty"`
+		MessageDetail string `json:"MessageDetail,omitempty"`
 	}
 
 	ErrorResponse struct {
-		*http.Response
+		resp          *http.Response
 		Message       string
 		MessageDetail string
 	}
 )
 
-func (r *BaseResponse) IsSuccessful() bool {
-	return r.IsResSuccessful
+func (r *BaseResponse) isSuccessful() bool {
+	return r.IsSuccessful
 }
 
-func (r *BaseResponse) Message() string {
-	return r.ResMessage
+func (r *BaseResponse) message() string {
+	return r.Message
 }
 
-func (r *BaseResponse) MessageDetail() string {
-	return r.ResMessageDetail
+func (r *BaseResponse) messageDetail() string {
+	return r.MessageDetail
 }
 
 func (r *ErrorResponse) Error() string {
 	return fmt.Sprintf("%v %v: %d %v %+v",
-		r.Response.Request.Method, r.Response.Request.URL,
-		r.Response.StatusCode, r.Message, r.MessageDetail)
+		r.resp.Request.Method, r.resp.Request.URL,
+		r.resp.StatusCode, r.Message, r.MessageDetail)
 }
