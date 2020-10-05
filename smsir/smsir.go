@@ -28,7 +28,9 @@ type Client struct {
 
 	common service
 
-	UserInfo *UserInfoSerive
+	UserInfo     *UserInfoSerive
+	SendReceive  *SendReceiveService
+	Verification *VerificationService
 }
 
 type service struct {
@@ -45,6 +47,8 @@ func NewClient(httpClient *http.Client) *Client {
 	c.common.client = c
 
 	c.UserInfo = (*UserInfoSerive)(&c.common)
+	c.SendReceive = (*SendReceiveService)(&c.common)
+	c.Verification = (*VerificationService)(&c.common)
 
 	return c
 }

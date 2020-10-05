@@ -144,33 +144,3 @@ func (s *SendReceiveService) GetSentReportByID(ctx context.Context, opts *Report
 	}
 	return r, nil
 }
-
-type UltraFastParameter struct {
-	Key   string `json:"Parameter,omitempty"`
-	Value string `json:"ParameterValue,omitempty"`
-}
-
-type UltraFastSendRequest struct {
-	Mobile     string               `json:"Mobile,omitempty"`
-	TemplateID string               `json:"TemplateId,omitempty"`
-	Parameters []UltraFastParameter `json:"ParameterArray,omitempty"`
-}
-
-type UltraFastSendResponse struct {
-	BaseResponse
-	VerificationCodeID int64 `json:"VerificationCodeId,omitempty"`
-}
-
-func (s *SendReceiveService) UltraFastSend(ctx context.Context, send *UltraFastSendRequest) (*UltraFastSendResponse, error) {
-	u := "UltraFastSend"
-	req, err := s.client.Post(u, send)
-	if err != nil {
-		return nil, err
-	}
-
-	f := new(UltraFastSendResponse)
-	if err := s.client.Do(ctx, req, f); err != nil {
-		return nil, err
-	}
-	return f, nil
-}
