@@ -19,6 +19,7 @@ import (
 const (
 	defaultBaseURL       = "http://RestfulSms.com/api/"
 	defaultUserAgent     = "go-smsir"
+	defaultAuthHeader    = "x-sms-ir-secure-token"
 	defaultTokenLifeTime = 30 * time.Minute
 )
 
@@ -139,10 +140,29 @@ func (c *Client) Delete(url string, body interface{}) (*http.Request, error) {
 	return c.NewRequest(http.MethodDelete, url, body)
 }
 
-func (c *Client) Do(ctx context.Context, req *http.Request, v apiResponse) error {
+func (c *Client) Do(ctx context.Context, req *http.Request, v apiResponse, auth ...bool) error {
 	if ctx == nil {
 		return errors.New("context must be non-nil")
 	}
+
+	shouldAuth := true
+	if len(auth) > 0 {
+		shouldAuth = auth[0]
+	}
+
+	if shouldAuth {
+		if c.tokenSource == nil {
+			return errors.New("request requires authentication and token source is not registered")
+		}
+
+		t, err := c.tokenSource.Token()
+		if err != nil {
+			return err
+		}
+
+		req.Header.Set(defaultAuthHeader, t.AccessToken)
+	}
+
 	req = req.WithContext(ctx)
 
 	resp, err := c.client.Do(req)
@@ -177,6 +197,17 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v apiResponse) error
 	}
 
 	return nil
+}
+
+func (c *Client) Token() (*Token, error) {
+	res, err := c.UserInfo.GetToken(context.Background(), &GetTokenRequest{})
+	if err != nil {
+		return nil, err
+	}
+	return &Token{
+		AccessToken: res.Token,
+		Expiry:      time.Now().Add(c.tokenLifeTime),
+	}, nil
 }
 
 func addOptions(s string, opts interface{}) (string, error) {

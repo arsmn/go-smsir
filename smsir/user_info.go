@@ -22,7 +22,7 @@ func (s *UserInfoSerive) GetToken(ctx context.Context, token *GetTokenRequest) (
 	}
 
 	t := new(GetTokenResponse)
-	if err := s.client.Do(ctx, req, t); err != nil {
+	if err := s.client.Do(ctx, req, t, false); err != nil {
 		return nil, err
 	}
 	return t, nil
