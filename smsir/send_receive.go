@@ -16,7 +16,7 @@ type MessageSendRequest struct {
 }
 
 type SentSMSLog struct {
-	ID           int64  `json:"ID,omitempty"`
+	ID           int    `json:"ID,omitempty"`
 	MobileNumber string `json:"MobileNo,omitempty"`
 }
 
@@ -57,7 +57,7 @@ type ReportByBatchKeyOptions struct {
 }
 
 type SentMessage struct {
-	ID                   int64  `json:"ID,omitempty"`
+	ID                   int    `json:"ID,omitempty"`
 	LineNumber           string `json:"LineNumber,omitempty"`
 	Body                 string `json:"SMSMessageBody,omitempty"`
 	MobileNumber         string `json:"MobileNo,omitempty"`
@@ -110,7 +110,7 @@ func (s *SendReceiveService) getReportByDate(ctx context.Context, u string, opts
 }
 
 type SentMessageDetail struct {
-	ID                       int64   `json:"ID,omitempty"`
+	ID                       int     `json:"ID,omitempty"`
 	MobileNumber             *string `json:"MobileNo,omitempty"`
 	SendDateTime             *string `json:"SendDateTime,omitempty"`
 	DeliveryStatus           *string `json:"DeliveryStatus,omitempty"`

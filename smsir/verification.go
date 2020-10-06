@@ -11,7 +11,7 @@ type VerificationCodeRequest struct {
 
 type VerificationCodeResponse struct {
 	BaseResponse
-	VerificationCodeID int64 `json:"VerificationCodeId,omitempty"`
+	VerificationCodeID int `json:"VerificationCodeId,omitempty"`
 }
 
 func (s *VerificationService) VerificationCode(ctx context.Context, send *VerificationCodeRequest) (*VerificationCodeResponse, error) {
@@ -39,9 +39,14 @@ type UltraFastSendRequest struct {
 	Parameters []UltraFastParameter `json:"ParameterArray,omitempty"`
 }
 
+type ultraFastSendResponse struct {
+	BaseResponse
+	VerificationCodeID float64 `json:"VerificationCodeId,omitempty"`
+}
+
 type UltraFastSendResponse struct {
 	BaseResponse
-	VerificationCodeID int64 `json:"VerificationCodeId,omitempty"`
+	VerificationCodeID int `json:"VerificationCodeId,omitempty"`
 }
 
 func (s *VerificationService) UltraFastSend(ctx context.Context, send *UltraFastSendRequest) (*UltraFastSendResponse, error) {
@@ -51,9 +56,12 @@ func (s *VerificationService) UltraFastSend(ctx context.Context, send *UltraFast
 		return nil, err
 	}
 
-	f := new(UltraFastSendResponse)
+	f := new(ultraFastSendResponse)
 	if err := s.client.Do(ctx, req, f); err != nil {
 		return nil, err
 	}
-	return f, nil
+	return &UltraFastSendResponse{
+		BaseResponse:       f.BaseResponse,
+		VerificationCodeID: int(f.VerificationCodeID),
+	}, nil
 }
