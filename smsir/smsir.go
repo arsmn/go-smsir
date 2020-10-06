@@ -209,7 +209,10 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v apiResponse, auth 
 }
 
 func (c *Client) Token() (*Token, error) {
-	res, err := c.UserInfo.GetToken(context.Background(), &GetTokenRequest{})
+	res, err := c.UserInfo.GetToken(context.Background(), &GetTokenRequest{
+		APIKey:    c.apiKey,
+		SecretKey: c.secretKey,
+	})
 	if err != nil {
 		return nil, err
 	}
