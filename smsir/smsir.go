@@ -29,6 +29,8 @@ type Client struct {
 	baseURL   *url.URL
 	userAgent string
 
+	apiKey, secretKey string
+
 	tokenSource   TokenSource
 	tokenLifeTime time.Duration
 
@@ -84,6 +86,13 @@ func (c *Client) WithTokenSource(ts TokenSource) *Client {
 
 func (c *Client) WithTokenLifeTime(lf time.Duration) *Client {
 	c.tokenLifeTime = lf
+	return c
+}
+
+func (c *Client) WithAuthentication(apiKey, secretKey string) *Client {
+	c.apiKey = apiKey
+	c.secretKey = secretKey
+	c.tokenSource = ReuseTokenSource(nil, c)
 	return c
 }
 
