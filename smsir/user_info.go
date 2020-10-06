@@ -15,7 +15,7 @@ type GetTokenResponse struct {
 }
 
 func (s *UserInfoSerive) GetToken(ctx context.Context, token *GetTokenRequest) (*GetTokenResponse, error) {
-	u := "token"
+	u := "Token"
 	req, err := s.client.Post(u, token)
 	if err != nil {
 		return nil, err
