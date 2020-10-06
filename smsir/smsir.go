@@ -11,20 +11,25 @@ import (
 	"net/url"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/google/go-querystring/query"
 )
 
 const (
-	defaultBaseURL   = "http://RestfulSms.com/api"
-	defaultUserAgent = "go-smsir"
+	defaultBaseURL       = "http://RestfulSms.com/api/"
+	defaultUserAgent     = "go-smsir"
+	defaultTokenLifeTime = 30 * time.Minute
 )
 
 type Client struct {
 	client *http.Client
 
-	BaseURL   *url.URL
-	UserAgent string
+	baseURL   *url.URL
+	userAgent string
+
+	tokenSource   TokenSource
+	tokenLifeTime time.Duration
 
 	common service
 
@@ -37,13 +42,16 @@ type service struct {
 	client *Client
 }
 
-func NewClient(httpClient *http.Client) *Client {
-	if httpClient == nil {
-		httpClient = &http.Client{}
-	}
+func NewClient() *Client {
 	baseURL, _ := url.Parse(defaultBaseURL)
 
-	c := &Client{client: httpClient, BaseURL: baseURL, UserAgent: defaultUserAgent}
+	c := &Client{
+		baseURL:       baseURL,
+		client:        &http.Client{},
+		userAgent:     defaultUserAgent,
+		tokenLifeTime: defaultTokenLifeTime,
+	}
+
 	c.common.client = c
 
 	c.UserInfo = (*UserInfoSerive)(&c.common)
@@ -53,12 +61,37 @@ func NewClient(httpClient *http.Client) *Client {
 	return c
 }
 
+func (c *Client) WithHttpClient(hc *http.Client) *Client {
+	c.client = hc
+	return c
+}
+
+func (c *Client) WithBaseURL(u *url.URL) *Client {
+	c.baseURL = u
+	return c
+}
+
+func (c *Client) WithUserAgent(ua string) *Client {
+	c.userAgent = ua
+	return c
+}
+
+func (c *Client) WithTokenSource(ts TokenSource) *Client {
+	c.tokenSource = ts
+	return c
+}
+
+func (c *Client) WithTokenLifeTime(lf time.Duration) *Client {
+	c.tokenLifeTime = lf
+	return c
+}
+
 func (c *Client) NewRequest(method, url string, body interface{}) (*http.Request, error) {
-	if !strings.HasSuffix(c.BaseURL.Path, "/") {
-		return nil, fmt.Errorf("BaseURL must have a trailing slash, but %q does not", c.BaseURL)
+	if !strings.HasSuffix(c.baseURL.Path, "/") {
+		return nil, fmt.Errorf("BaseURL must have a trailing slash, but %q does not", c.baseURL)
 	}
 
-	u, err := c.BaseURL.Parse(url)
+	u, err := c.baseURL.Parse(url)
 	if err != nil {
 		return nil, err
 	}
@@ -83,8 +116,8 @@ func (c *Client) NewRequest(method, url string, body interface{}) (*http.Request
 		req.Header.Set("Content-Type", "application/json")
 	}
 
-	if c.UserAgent != "" {
-		req.Header.Set("User-Agent", c.UserAgent)
+	if c.userAgent != "" {
+		req.Header.Set("User-Agent", c.userAgent)
 	}
 
 	return req, nil
