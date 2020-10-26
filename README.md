@@ -20,7 +20,7 @@ access different parts of the smsir API. For example:
 ```go
 client := github.NewClient().WithAuthentication("Your API Key", "Your Secret Key")
 
-// send an sms with template
+// send sms with template
 req := &smsir.UltraFastSendRequest{
 	Mobile:     "xxx",
 	TemplateID: "xxx",
