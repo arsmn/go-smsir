@@ -9,18 +9,10 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"reflect"
 	"strings"
 	"time"
 
 	"github.com/google/go-querystring/query"
-)
-
-const (
-	defaultBaseURL       = "http://RestfulSms.com/api/"
-	defaultUserAgent     = "go-smsir"
-	defaultAuthHeader    = "x-sms-ir-secure-token"
-	defaultTokenLifeTime = 30 * time.Minute
 )
 
 type Client struct {
@@ -46,11 +38,9 @@ type service struct {
 }
 
 func NewClient() *Client {
-	baseURL, _ := url.Parse(defaultBaseURL)
-
 	c := &Client{
-		baseURL:       baseURL,
-		client:        &http.Client{},
+		baseURL:       defaultBaseURL,
+		client:        defaultClient,
 		userAgent:     defaultUserAgent,
 		tokenLifeTime: defaultTokenLifeTime,
 	}
@@ -223,8 +213,7 @@ func (c *Client) Token() (*Token, error) {
 }
 
 func addOptions(s string, opts interface{}) (string, error) {
-	v := reflect.ValueOf(opts)
-	if v.Kind() == reflect.Ptr && v.IsNil() {
+	if opts == nil {
 		return s, nil
 	}
 
